@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:khatabookclone/bottamnavigator/customerpage.dart';
+import 'package:khatabookclone/bottamnavigator/supplierspage.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 class PartiesPage extends StatefulWidget {
@@ -94,26 +96,10 @@ class _PartiesPageState extends State<PartiesPage>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          const Center(child: Text('Customer Content')),
-          const Center(child: Text('Supplier Content')),
+        children: const [
+          CustomerPage(),
+          SuppliersPage(),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        elevation: 8,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(40.0),
-        ),
-        onPressed: () {},
-        label: const Row(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Icon(Icons.person_add),
-            ),
-            Text("ADD CUTOMER"),
-          ],
-        ),
       ),
     );
   }
