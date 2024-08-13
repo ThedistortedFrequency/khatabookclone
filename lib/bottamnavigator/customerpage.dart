@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:khatabookclone/utils/routes.dart';
 import 'package:khatabookclone/widgets/customfab.dart';
 
 class CustomerPage extends StatelessWidget {
@@ -83,7 +84,10 @@ class CustomerPage extends StatelessWidget {
           )
         ],
       ),
-      floatingActionButton: const CustomFAB(
+      floatingActionButton: CustomFAB(
+        onpressed: () {
+          Navigator.pushNamed(context, Screen.addCustomerPage);
+        },
         color: Colors.red,
         text: "ADD CUSTOMER",
       ),

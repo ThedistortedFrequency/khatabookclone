@@ -83,7 +83,8 @@ class SuppliersPage extends StatelessWidget {
             )
           ],
         ),
-        floatingActionButton: const CustomFAB(
+        floatingActionButton: CustomFAB(
+          onpressed: () {},
           text: "ADD SUPPLIER",
           color: Colors.indigo,
         ));
