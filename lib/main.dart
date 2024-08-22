@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:khatabookclone/Auth/login.dart';
 import 'package:khatabookclone/addcustomer.dart';
 import 'package:khatabookclone/homepage.dart';
 import 'package:khatabookclone/utils/routes.dart';
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       routes: {
-        "/": (context) => const HomePage(),
+        "/": (context) => const LoginPage(),
         Screen.addCustomerPage: (context) => const Addcustomer()
       },
     );
