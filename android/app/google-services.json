@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "736738794720",
+    "project_id": "kbookclone",
+    "storage_bucket": "kbookclone.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:736738794720:android:5bf86fa4c4fe5f24afc485",
+        "android_client_info": {
+          "package_name": "com.example.khatabookclone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUBRgT3RUzoM-t40rb_bxcf3gDdEANkYo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

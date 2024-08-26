@@ -32,7 +32,7 @@ class _PartiesPageState extends State<PartiesPage>
       appBar: AppBar(
         backgroundColor: Colors.indigo,
         title: const Text(
-          "Vyapak Group Tution",
+          "Hisabkitab",
           style: TextStyle(
               color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
         ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:khatabookclone/utils/routes.dart';
 import 'package:khatabookclone/widgets/customfab.dart';
 
 class CustomerPage extends StatelessWidget {
@@ -36,7 +35,7 @@ class CustomerPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '₹500',
+                            '₹0',
                             style: TextStyle(
                                 color: Colors.green,
                                 fontWeight: FontWeight.bold,
@@ -86,11 +85,121 @@ class CustomerPage extends StatelessWidget {
       ),
       floatingActionButton: CustomFAB(
         onpressed: () {
-          Navigator.pushNamed(context, Screen.addCustomerPage);
+          // Navigator.pushNamed(context, Screen.addCustomerPage);
+          _showCustomBottomSheet(context);
         },
         color: Colors.red,
         text: "ADD CUSTOMER",
       ),
     );
   }
+}
+
+void _showCustomBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+
+    backgroundColor:
+        Colors.transparent, // Make background transparent for custom card
+    builder: (BuildContext context) {
+      return Container(
+        padding: const EdgeInsets.all(30.0),
+        decoration: const BoxDecoration(
+          color: Colors.white, // Set card background color
+          borderRadius: BorderRadius.vertical(
+              top: Radius.circular(16)), // Rounded top corners
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const SizedBox(height: 16),
+            const TextField(
+              decoration: InputDecoration(
+                labelText: 'Phone Number',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.phone,
+            ),
+            const SizedBox(height: 16),
+            const TextField(
+              decoration: InputDecoration(
+                labelText: 'Amount',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: null,
+              decoration: const InputDecoration(
+                labelText: 'Transaction Type',
+                border: OutlineInputBorder(),
+              ),
+              items: <String>['Credit', 'Debit'].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                // Handle dropdown change
+              },
+            ),
+            const SizedBox(height: 16),
+            const TextField(
+              decoration: InputDecoration(
+                labelText: 'Interest',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 24), // Added space before buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Handle submit action
+                    },
+                    child: const Text('ADD TRANSACTION'),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.teal, // Text color
+                      padding: EdgeInsets.symmetric(
+                          vertical: 16), // Vertical padding
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(16), // Rounded corners
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 16), // Space between buttons
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the bottom sheet
+                    },
+                    child: const Text('CLOSE'),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.teal, // Text color
+                      padding: EdgeInsets.symmetric(
+                          vertical: 16), // Vertical padding
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(16), // Rounded corners
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }

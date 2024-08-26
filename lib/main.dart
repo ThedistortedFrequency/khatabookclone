@@ -1,9 +1,14 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:khatabookclone/addcustomer.dart';
+import 'package:khatabookclone/firebase_options.dart';
 import 'package:khatabookclone/homepage.dart';
 import 'package:khatabookclone/utils/routes.dart';
 
-void main() {
+void main() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -21,7 +26,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: {
         "/": (context) => const HomePage(),
-        Screen.addCustomerPage: (context) => const Addcustomer()
+        Screen.addCustomerPage: (context) => const AddCustomer()
       },
     );
   }
