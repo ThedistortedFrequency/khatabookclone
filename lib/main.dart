@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:khatabookclone/addcustomer.dart';
+import 'package:khatabookclone/bottamnavigator/customerpage.dart';
 import 'package:khatabookclone/firebase_options.dart';
 import 'package:khatabookclone/homepage.dart';
 import 'package:khatabookclone/utils/routes.dart';
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: {
         "/": (context) => const HomePage(),
-        Screen.addCustomerPage: (context) => const AddCustomer()
+        Screen.addCustomerPage: (context) => const CustomerPage()
       },
     );
   }
