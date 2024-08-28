@@ -14,9 +14,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
-  List bottompages = const [
+  List bottompages = [
     PartiesPage(),
-    BillPage(),
+    UserList(),
     ItemPage(),
     MorePage(),
   ];
