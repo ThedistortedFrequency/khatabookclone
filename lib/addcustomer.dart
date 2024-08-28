@@ -83,7 +83,7 @@ class __ScrollableContentState extends State<_ScrollableContent> {
     String transactionType,
   ) async {
     // Show loading indicator
-    final loadingDialogFuture = showDialog(
+    showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:khatabookclone/addcustomer.dart';
+import 'package:khatabookclone/utils/routes.dart';
 import 'package:khatabookclone/widgets/customfab.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -104,14 +105,14 @@ class _UserListState extends State<UserList> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '₹$totalDebit',
+                            '₹$totalCredit',
                             style: const TextStyle(
                                 color: Colors.green,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15),
                           ),
                           const Text(
-                            "You will give",
+                            "Credit",
                             style:
                                 TextStyle(color: Colors.black38, fontSize: 12),
                           )
@@ -125,14 +126,14 @@ class _UserListState extends State<UserList> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '₹$totalCredit',
+                            '₹$totalDebit',
                             style: const TextStyle(
                                 color: Colors.red,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15),
                           ),
                           const Text(
-                            "You will get",
+                            "Debit",
                             style:
                                 TextStyle(color: Colors.black38, fontSize: 12),
                           )
@@ -143,7 +144,10 @@ class _UserListState extends State<UserList> {
                         child: VerticalDivider(),
                       ),
                       TextButton(
-                          onPressed: () {}, child: const Text("View Report"))
+                          onPressed: () {
+                            Navigator.pushNamed(context, Screen.viewreport);
+                          },
+                          child: const Text("View Report"))
                     ],
                   ),
                 ),
@@ -269,7 +273,6 @@ class _UserListState extends State<UserList> {
           showCustomBottomSheet(context);
         },
         color: Colors.red,
-        text: "ADD CUSTOMER",
       ),
     );
   }
@@ -317,10 +320,10 @@ class EditUserScreen extends StatefulWidget {
   const EditUserScreen({super.key, required this.userId});
 
   @override
-  _EditUserScreenState createState() => _EditUserScreenState();
+  EditUserScreenState createState() => EditUserScreenState();
 }
 
-class _EditUserScreenState extends State<EditUserScreen> {
+class EditUserScreenState extends State<EditUserScreen> {
   final _amountController = TextEditingController();
   final _interestController = TextEditingController();
 
@@ -345,9 +348,6 @@ class _EditUserScreenState extends State<EditUserScreen> {
     double amount = double.tryParse(_amountController.text) ?? 0.0;
     double interestRate = double.tryParse(_interestController.text) ?? 0.0;
 
-    int interestAmount = (amount * (interestRate / 100)).round();
-    double totalAmount = amount + interestAmount;
-
     await FirebaseFirestore.instance
         .collection('users')
         .doc(widget.userId)
@@ -357,6 +357,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
       'timestamp': FieldValue.serverTimestamp(),
     });
 
+    // ignore: use_build_context_synchronously
     Navigator.of(context).pop();
   }
 

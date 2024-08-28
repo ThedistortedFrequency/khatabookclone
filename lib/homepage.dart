@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:khatabookclone/bottamnavigator/billpage.dart';
-import 'package:khatabookclone/bottamnavigator/itempage.dart';
 import 'package:khatabookclone/bottamnavigator/more.dart';
 import 'package:khatabookclone/bottamnavigator/parties.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -16,8 +14,6 @@ class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
   List bottompages = [
     UserList(),
-    BillPage(),
-    ItemPage(),
     MorePage(),
   ];
   @override
@@ -39,18 +35,6 @@ class _HomePageState extends State<HomePage> {
               LucideIcons.home,
             ),
             label: "Parties",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              LucideIcons.receipt,
-            ),
-            label: "Bills",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              LucideIcons.shoppingBag,
-            ),
-            label: "Item",
           ),
           BottomNavigationBarItem(
             icon: Icon(

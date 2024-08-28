@@ -7,7 +7,7 @@ class MorePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text("More Page"),
+        child: Text("Work IN Progress...."),
       ),
     );
   }
