@@ -1,8 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:khatabookclone/addcustomer.dart';
-import 'package:khatabookclone/utils/routes.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:khatabookclone/widgets/customfab.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -144,9 +148,7 @@ class _UserListState extends State<UserList> {
                         child: VerticalDivider(),
                       ),
                       TextButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, Screen.viewreport);
-                          },
+                          onPressed: _generatePdfReport,
                           child: const Text("View Report"))
                     ],
                   ),
@@ -275,6 +277,157 @@ class _UserListState extends State<UserList> {
         color: Colors.red,
       ),
     );
+  }
+
+  Future<void> requestPermissions() async {
+    final status = await Permission.storage.request();
+    if (status.isGranted) {
+      print("Storage permission granted");
+    } else {
+      print("Storage permission denied");
+    }
+  }
+
+  Future<File> _getExternalStorageFile(String filename) async {
+    final directory = await getExternalStorageDirectory();
+    final file = File('${directory!.path}/$filename');
+    return file;
+  }
+
+  Future<void> saveFile(String filename, List<int> bytes) async {
+    // Ensure permissions are granted
+    await requestPermissions();
+
+    // Save file to external storage directory
+    final file = await _getExternalStorageFile(filename);
+    await file.writeAsBytes(bytes);
+  }
+
+  Future<void> _generatePdfReport() async {
+    // Request storage permission
+    final status = await Permission.storage.request();
+    if (!status.isGranted) {
+      ScaffoldMessenger.of(BuildContext as BuildContext).showSnackBar(
+        const SnackBar(content: Text('Permission denied')),
+      );
+      return;
+    }
+
+    final pdf = pw.Document();
+    final userCollection = FirebaseFirestore.instance.collection('users');
+    final snapshot = await userCollection.get();
+    final users = snapshot.docs;
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'User Report',
+                style:
+                    pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+              ),
+              pw.SizedBox(height: 20),
+              pw.Table(
+                border: pw.TableBorder.all(),
+                children: [
+                  pw.TableRow(
+                    children: [
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text('Name',
+                            style:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text('Number',
+                            style:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text('Amount',
+                            style:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text('Interest',
+                            style:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text('Total Amount',
+                            style:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                  // Add table rows for each user
+                  ...users.map((doc) {
+                    final data = doc.data();
+                    final name = data['Name'] ?? 'N/A';
+                    final number = data['Number'] ?? 'N/A';
+                    final amount = (data['Amount'] ?? 0.0).toStringAsFixed(2);
+                    final interest =
+                        (data['Interest'] ?? 0.0).toStringAsFixed(2);
+                    final interestAmount = ((double.tryParse(amount) ?? 0.0) *
+                            (double.tryParse(interest) ?? 0.0) /
+                            100)
+                        .toStringAsFixed(2);
+                    final totalAmount = (double.tryParse(amount) ?? 0.0) +
+                        (double.tryParse(interestAmount) ?? 0.0);
+
+                    return pw.TableRow(
+                      children: [
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(name),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(number),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text('₹$amount'),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text('$interest%'),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text('₹${totalAmount.toStringAsFixed(2)}'),
+                        ),
+                      ],
+                    );
+                  }),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    // Save the PDF file
+    final outputFile = await _getOutputFile();
+    await outputFile.writeAsBytes(await pdf.save());
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('PDF Report generated at ${outputFile.path}')),
+    );
+  }
+
+  Future<File> _getOutputFile() async {
+    final directory =
+        await getExternalStorageDirectory(); // Using external storage
+    final file = File('${directory!.path}/user_report.pdf');
+    return file;
   }
 
   void _showDeleteConfirmationDialog(BuildContext context, String documentId) {
