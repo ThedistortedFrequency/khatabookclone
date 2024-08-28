@@ -78,8 +78,8 @@ class __ScrollableContentState extends State<_ScrollableContent> {
     BuildContext context,
     String name,
     String phoneNo,
-    String amount,
-    String interest,
+    double amount,
+    double interest,
     String transactionType,
   ) async {
     // Show loading indicator
@@ -157,16 +157,16 @@ class __ScrollableContentState extends State<_ScrollableContent> {
   void _handleSubmit() {
     final name = _nameController.text;
     final phoneNo = _phoneController.text;
-    final amount = _amountController.text;
-    final interest = _interestController.text;
+    final amountText = _amountController.text;
+    final interestText = _interestController.text;
     final transactionType = _selectedTransactionType;
 
     // Validate all fields
     final phoneNumberError = _validatePhoneNumber(phoneNo);
     if (name.isEmpty ||
         phoneNo.isEmpty ||
-        amount.isEmpty ||
-        interest.isEmpty ||
+        amountText.isEmpty ||
+        interestText.isEmpty ||
         transactionType == null ||
         phoneNumberError != null) {
       // Show an error dialog if any field is empty, transactionType is null, or phone number is invalid
@@ -191,6 +191,10 @@ class __ScrollableContentState extends State<_ScrollableContent> {
       );
       return;
     }
+
+    // Convert amount and interest to double
+    final double amount = double.tryParse(amountText) ?? 0.0;
+    final double interest = double.tryParse(interestText) ?? 0.0;
 
     // Call addUserDetails with validated data
     addUserDetails(

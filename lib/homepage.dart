@@ -15,8 +15,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
   List bottompages = [
-    PartiesPage(),
     UserList(),
+    BillPage(),
     ItemPage(),
     MorePage(),
   ];
