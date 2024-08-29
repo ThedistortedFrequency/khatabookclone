@@ -1,5 +1,6 @@
 import 'dart:io';
-import 'package:flutter/services.dart';
+import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:khatabookclone/addcustomer.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -159,7 +160,7 @@ class _UserListState extends State<UserList> {
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('users').snapshots(),
+        stream: FirebaseFirestore.instance.collection('users').orderBy('timestamp', descending: true).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -201,10 +202,23 @@ class _UserListState extends State<UserList> {
               padding:
                   const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
               child: Container(
-                color: backgroundColor,
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(15)),
+                    color: backgroundColor,
+                  border: Border.all(
+                    width: 1.0,
+                    color: transactionType == 'Credit' ? Colors.green : Colors.red,
+                  )
+                ),
+
                 child: ListTile(
                   contentPadding: const EdgeInsets.all(16.0),
-                  title: Text(user['Name'] ?? 'No Name'),
+                  title: Text(user['Name'] ?? 'No Name', style: const TextStyle( fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontSize: 16,
+
+                  ),
+                  ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -213,24 +227,24 @@ class _UserListState extends State<UserList> {
                       Text(
                           'Interest Rate: ${interestRate.toStringAsFixed(2)}%'),
                       const SizedBox(height: 8.0),
-                      Text('Amount: ₹${amount.toStringAsFixed(2)}'),
+                      Text('Amount: ₹${amount.toStringAsFixed(0)}'),
                       Text('Interest Amount: ₹$interestAmount'),
                       const SizedBox(height: 8.0),
                       RichText(
                         text: TextSpan(
                           children: [
                             const TextSpan(
-                              text: 'Total Amount Including Interest: ₹',
-                              style: TextStyle(color: Colors.black),
+                              text: 'Total Amount: ',
+                              style: TextStyle(color: Colors.blueGrey, fontWeight: FontWeight.w700),
                             ),
                             TextSpan(
-                              text: totalAmount.toStringAsFixed(2),
+                              text: "₹${totalAmount.toStringAsFixed(0)}",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: numberColor,
                               ),
                             ),
-                          ],
+                         ],
                         ),
                       ),
                     ],
@@ -247,7 +261,7 @@ class _UserListState extends State<UserList> {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete),
+                        icon: const Icon(LucideIcons.trash2),
                         onPressed: () {
                           _showDeleteConfirmationDialog(context, id);
                         },
@@ -282,9 +296,12 @@ class _UserListState extends State<UserList> {
   Future<void> requestPermissions() async {
     final status = await Permission.storage.request();
     if (status.isGranted) {
-      print("Storage permission granted");
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Storage permission granted")),);
     } else {
-      print("Storage permission denied");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Storage permission denied")),
+      );
     }
   }
 
@@ -522,25 +539,44 @@ class EditUserScreenState extends State<EditUserScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: _amountController,
-              decoration: const InputDecoration(labelText: 'Amount'),
-              keyboardType: TextInputType.number,
-            ),
-            TextField(
-              controller: _interestController,
-              decoration: const InputDecoration(labelText: 'Interest Rate (%)'),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _updateUser,
-              child: const Text('Update User'),
-            ),
-          ],
+        child: Center(
+          child: Column(
+             crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _amountController,
+                  decoration: const InputDecoration(labelText: 'Amount', border: OutlineInputBorder()),
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _interestController,
+                  decoration: const InputDecoration(labelText: 'Interest Rate (%)', border: OutlineInputBorder()),
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: _updateUser,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.teal,
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 16),
+                  shape:  RoundedRectangleBorder(
+                    borderRadius:
+                    BorderRadius.circular(16), // Rounded corners
+                  ),
+                ),
+                child: const Text('Update User', style: TextStyle(fontWeight: FontWeight.bold),),
+              ),
+            ],
+          ),
         ),
       ),
     );

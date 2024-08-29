@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:khatabookclone/bottamnavigator/parties.dart';
 import 'package:khatabookclone/firebase_options.dart';
 import 'package:khatabookclone/homepage.dart';
@@ -25,7 +26,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
         useMaterial3: true,
+        textTheme: GoogleFonts.latoTextTheme(),
       ),
+
       debugShowCheckedModeBanner: false,
       routes: {
         "/": (context) => const HomePage(),
