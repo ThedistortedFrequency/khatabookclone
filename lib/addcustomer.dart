@@ -245,14 +245,14 @@ class __ScrollableContentState extends State<_ScrollableContent> {
     return Container(
       padding: const EdgeInsets.all(30.0),
       decoration: const BoxDecoration(
-        color: Colors.white, // Set card background color
+        color: Colors.white,
         borderRadius: BorderRadius.vertical(
             top: Radius.circular(16)), // Rounded top corners
       ),
       child: ListView(
-        controller: widget.scrollController, // Attach the ScrollController
+        controller: widget.scrollController,
         keyboardDismissBehavior:
-            ScrollViewKeyboardDismissBehavior.manual, // Set behavior here
+            ScrollViewKeyboardDismissBehavior.manual,
         children: <Widget>[
           const SizedBox(height: 16),
           TextField(
@@ -268,12 +268,12 @@ class __ScrollableContentState extends State<_ScrollableContent> {
             decoration: InputDecoration(
               labelText: 'Phone Number',
               border: const OutlineInputBorder(),
-              errorText: _phoneNumberError, // Display the error if any
+              errorText: _phoneNumberError,
             ),
             keyboardType: TextInputType.phone,
             maxLength: 10, // Limit input to 10 characters
             inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly, // Allow only digits
+              FilteringTextInputFormatter.digitsOnly,
             ],
           ),
           const SizedBox(height: 16),
@@ -315,7 +315,7 @@ class __ScrollableContentState extends State<_ScrollableContent> {
             ),
             keyboardType: TextInputType.number,
           ),
-          const SizedBox(height: 24), // Added space before buttons
+          const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
@@ -324,18 +324,18 @@ class __ScrollableContentState extends State<_ScrollableContent> {
                   onPressed: _handleSubmit,
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: Colors.teal, // Button color
+                    backgroundColor: Colors.teal,
                     padding: const EdgeInsets.symmetric(
                         vertical: 16), // Vertical padding
                     shape: RoundedRectangleBorder(
                       borderRadius:
-                          BorderRadius.circular(16), // Rounded corners
+                          BorderRadius.circular(16),
                     ),
                   ),
                   child: const Text('ADD TRANSACTION'),
                 ),
               ),
-              const SizedBox(width: 16), // Space between buttons
+              const SizedBox(width: 16),
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
