@@ -1,15 +1,12 @@
-import 'dart:io';
-import 'dart:ui';
-import 'package:flutter/cupertino.dart';
+
 import 'package:khatabookclone/addcustomer.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:pdf/widgets.dart' as pw;
+import 'package:khatabookclone/utils/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:khatabookclone/widgets/customfab.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:timeago/timeago.dart' as timeago;
+
 
 class UserList extends StatefulWidget {
   const UserList({super.key});
@@ -149,7 +146,9 @@ class _UserListState extends State<UserList> {
                         child: VerticalDivider(),
                       ),
                       TextButton(
-                          onPressed: _generatePdfReport,
+                          onPressed: (){
+                            Navigator.pushNamed(context, Screen.viewreport);
+                          },
                           child: const Text("View Report"))
                     ],
                   ),
@@ -185,7 +184,7 @@ class _UserListState extends State<UserList> {
             var interestRate =
                 double.tryParse(user['Interest']?.toString() ?? '0.0') ?? 0.0;
             var timestamp = user['timestamp']
-                ?.toDate(); // Convert Firestore timestamp to DateTime
+                ?.toDate();
 
             // Calculate and round off interest amount
             int interestAmount = (amount * (interestRate / 100)).round();
@@ -199,81 +198,60 @@ class _UserListState extends State<UserList> {
                 transactionType == 'Credit' ? Colors.green : Colors.red;
 
             return Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(15)),
-                    color: backgroundColor,
-                  border: Border.all(
-                    width: 1.0,
-                    color: transactionType == 'Credit' ? Colors.green : Colors.red,
-                  )
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Colors.grey[300]!, // Light grey color
+                      width: 1.0, // Thickness of the border
+                    ),
+                  ),
                 ),
-
                 child: ListTile(
-                  contentPadding: const EdgeInsets.all(16.0),
-                  title: Text(user['Name'] ?? 'No Name', style: const TextStyle( fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 16,
+                   title:Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: [
+                       Text(
+                         user['Name'] ?? 'No Name',
+                         style: const TextStyle(
+                           fontWeight: FontWeight.w600,
+                           color: Colors.black,
+                         ),
+                       ),
 
+                       Text(
+                         timeago.format(timestamp ?? DateTime.now()),
+                         style: const TextStyle(
+                           color: Colors.grey,
+                           fontSize: 12,
+                         ),
+                       ),
+                     ],
+                   ),
+                  trailing: Text(
+                    '₹${totalAmount.toStringAsFixed(0)}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: numberColor,
+                      fontSize: 16,
+                    ),
                   ),
+                  leading: CircleAvatar(
+                    backgroundColor: transactionType == 'Credit' ? Colors.green[50] : Colors.red[50],
+                    child: Icon(
+                      transactionType == 'Credit'
+                          ? Icons.arrow_upward
+                          : Icons.arrow_downward,
+                      color: numberColor,
+                    ),
                   ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                          'Date: ${timestamp != null ? DateFormat('dd MMM yyyy').format(timestamp) : 'No Date'}'),
-                      Text(
-                          'Interest Rate: ${interestRate.toStringAsFixed(2)}%'),
-                      const SizedBox(height: 8.0),
-                      Text('Amount: ₹${amount.toStringAsFixed(0)}'),
-                      Text('Interest Amount: ₹$interestAmount'),
-                      const SizedBox(height: 8.0),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            const TextSpan(
-                              text: 'Total Amount: ',
-                              style: TextStyle(color: Colors.blueGrey, fontWeight: FontWeight.w700),
-                            ),
-                            TextSpan(
-                              text: "₹${totalAmount.toStringAsFixed(0)}",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: numberColor,
-                              ),
-                            ),
-                         ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => EditUserScreen(userId: id),
-                          ));
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(LucideIcons.trash2),
-                        onPressed: () {
-                          _showDeleteConfirmationDialog(context, id);
-                        },
-                      ),
-                    ],
-                  ),
-                  leading: Icon(
-                    transactionType == 'Credit'
-                        ? Icons.arrow_upward
-                        : Icons.arrow_downward,
-                    color: numberColor,
-                  ),
+                  onTap: () {
+                    // Navigate to a new page for that specific person
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => PersonDetailScreen(userId: id),
+                    ));
+                  },
                 ),
               ),
             );
@@ -292,161 +270,6 @@ class _UserListState extends State<UserList> {
       ),
     );
   }
-
-  Future<void> requestPermissions() async {
-    final status = await Permission.storage.request();
-    if (status.isGranted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Storage permission granted")),);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Storage permission denied")),
-      );
-    }
-  }
-
-  Future<File> _getExternalStorageFile(String filename) async {
-    final directory = await getExternalStorageDirectory();
-    final file = File('${directory!.path}/$filename');
-    return file;
-  }
-
-  Future<void> saveFile(String filename, List<int> bytes) async {
-    // Ensure permissions are granted
-    await requestPermissions();
-
-    // Save file to external storage directory
-    final file = await _getExternalStorageFile(filename);
-    await file.writeAsBytes(bytes);
-  }
-
-  Future<void> _generatePdfReport() async {
-    // Request storage permission
-    final status = await Permission.storage.request();
-    if (!status.isGranted) {
-      ScaffoldMessenger.of(BuildContext as BuildContext).showSnackBar(
-        const SnackBar(content: Text('Permission denied')),
-      );
-      return;
-    }
-
-    final pdf = pw.Document();
-    final userCollection = FirebaseFirestore.instance.collection('users');
-    final snapshot = await userCollection.get();
-    final users = snapshot.docs;
-
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text(
-                'User Report',
-                style:
-                    pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
-              ),
-              pw.SizedBox(height: 20),
-              pw.Table(
-                border: pw.TableBorder.all(),
-                children: [
-                  pw.TableRow(
-                    children: [
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text('Name',
-                            style:
-                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text('Number',
-                            style:
-                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text('Amount',
-                            style:
-                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text('Interest',
-                            style:
-                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text('Total Amount',
-                            style:
-                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      ),
-                    ],
-                  ),
-                  // Add table rows for each user
-                  ...users.map((doc) {
-                    final data = doc.data();
-                    final name = data['Name'] ?? 'N/A';
-                    final number = data['Number'] ?? 'N/A';
-                    final amount = (data['Amount'] ?? 0.0).toStringAsFixed(2);
-                    final interest =
-                        (data['Interest'] ?? 0.0).toStringAsFixed(2);
-                    final interestAmount = ((double.tryParse(amount) ?? 0.0) *
-                            (double.tryParse(interest) ?? 0.0) /
-                            100)
-                        .toStringAsFixed(2);
-                    final totalAmount = (double.tryParse(amount) ?? 0.0) +
-                        (double.tryParse(interestAmount) ?? 0.0);
-
-                    return pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(name),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(number),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text('₹$amount'),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text('$interest%'),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text('₹${totalAmount.toStringAsFixed(2)}'),
-                        ),
-                      ],
-                    );
-                  }),
-                ],
-              ),
-            ],
-          );
-        },
-      ),
-    );
-
-    // Save the PDF file
-    final outputFile = await _getOutputFile();
-    await outputFile.writeAsBytes(await pdf.save());
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('PDF Report generated at ${outputFile.path}')),
-    );
-  }
-
-  Future<File> _getOutputFile() async {
-    final directory =
-        await getExternalStorageDirectory(); // Using external storage
-    final file = File('${directory!.path}/user_report.pdf');
-    return file;
-  }
-
   void _showDeleteConfirmationDialog(BuildContext context, String documentId) {
     showDialog(
       context: context,
@@ -484,6 +307,65 @@ class _UserListState extends State<UserList> {
     );
   }
 }
+
+class PersonDetailScreen extends StatelessWidget {
+  final String userId;
+
+  const PersonDetailScreen({Key? key, required this.userId}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance.collection('users').doc(userId).get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Scaffold(
+            body: Center(child: Text('Error: ${snapshot.error}')),
+          );
+        }
+
+        if (!snapshot.hasData || !snapshot.data!.exists) {
+          return const Scaffold(
+            body: Center(child: Text('No data available')),
+          );
+        }
+
+        var user = snapshot.data!.data() as Map<String, dynamic>;
+        var creditBalance = user['Transaction Type'] == 'Credit'
+            ? user['Amount']
+            : 0;
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('${user['Name']}  '),
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Name: ${user['Name']}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 16.0),
+                Text('Amount: ₹${user['Amount'].toStringAsFixed(0)}'),
+                Text('Interest Rate: ${user['Interest'].toStringAsFixed(2)}%'),
+                Text('Transaction Type: ${user['Transaction Type']}'),
+                // Add more details as needed
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+
 
 class EditUserScreen extends StatefulWidget {
   final String userId;
