@@ -180,23 +180,16 @@ class _UserListState extends State<UserList> {
             var user = doc.data() as Map<String, dynamic>;
             var id = doc.id;
             var transactionType = user['Transaction Type'] ?? 'Unknown';
-            var amount =
-                double.tryParse(user['Amount']?.toString() ?? '0.0') ?? 0.0;
-            var interestRate =
-                double.tryParse(user['Interest']?.toString() ?? '0.0') ?? 0.0;
-            var timestamp = user['timestamp']
-                ?.toDate();
+            var amount = double.tryParse(user['Amount']?.toString() ?? '0.0') ?? 0.0;
+            var interestRate = double.tryParse(user['Interest']?.toString() ?? '0.0') ?? 0.0;
+            var timestamp = user['timestamp']?.toDate();
 
             // Calculate and round off interest amount
             int interestAmount = (amount * (interestRate / 100)).round();
             double totalAmount = amount + interestAmount;
 
             // Determine the color based on the transaction type
-            Color backgroundColor = transactionType == 'Credit'
-                ? Colors.lightGreen[50]!
-                : Colors.red[50]!;
-            Color numberColor =
-                transactionType == 'Credit' ? Colors.green : Colors.red;
+            Color numberColor = transactionType == 'Credit' ? Colors.green : Colors.red;
 
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
@@ -210,26 +203,25 @@ class _UserListState extends State<UserList> {
                   ),
                 ),
                 child: ListTile(
-                   title:Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
-                     children: [
-                       Text(
-                         user['Name'] ?? 'No Name',
-                         style: const TextStyle(
-                           fontWeight: FontWeight.w600,
-                           color: Colors.black,
-                         ),
-                       ),
-
-                       Text(
-                         timeago.format(timestamp ?? DateTime.now()),
-                         style: const TextStyle(
-                           color: Colors.grey,
-                           fontSize: 12,
-                         ),
-                       ),
-                     ],
-                   ),
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user['Name'] ?? 'No Name',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        timeago.format(timestamp ?? DateTime.now()),
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
                   trailing: Text(
                     '₹${totalAmount.toStringAsFixed(0)}',
                     style: TextStyle(
@@ -271,6 +263,9 @@ class _UserListState extends State<UserList> {
       ),
     );
   }
+
+
+
   void _showDeleteConfirmationDialog(BuildContext context, String documentId) {
     showDialog(
       context: context,
