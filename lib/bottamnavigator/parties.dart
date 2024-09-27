@@ -7,15 +7,12 @@ import 'package:khatabookclone/widgets/customfab.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-
-
 class UserList extends StatefulWidget {
   const UserList({super.key});
 
   @override
   _UserListState createState() => _UserListState();
 }
-
 class _UserListState extends State<UserList> {
   double totalCredit = 0.0;
   double totalDebit = 0.0;
@@ -161,7 +158,7 @@ class _UserListState extends State<UserList> {
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('users').orderBy('timestamp', descending: true).snapshots(),
-        builder: (context, snapshot) {
+        builder: (context, snapshot ) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -173,6 +170,8 @@ class _UserListState extends State<UserList> {
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(child: Text('No data available'));
           }
+
+
 
           var userDocs = snapshot.data!.docs;
 
@@ -190,6 +189,8 @@ class _UserListState extends State<UserList> {
 
             // Determine the color based on the transaction type
             Color numberColor = transactionType == 'Credit' ? Colors.green : Colors.red;
+
+
 
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
